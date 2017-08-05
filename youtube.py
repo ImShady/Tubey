@@ -1,7 +1,6 @@
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from oauth2client.tools import argparser
-import json
 
 class Youtube():
     """Class that contains all of the youtube API related functions"""
