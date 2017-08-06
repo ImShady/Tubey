@@ -45,11 +45,9 @@ class Youtube():
             videos.append("{} ({})".format(result["snippet"]["title"],result["id"]["videoId"]))
 
           elif result["id"]["kind"] == "youtube#channel":
-            channels.append("%s (%s)" % (result["snippet"]["title"],
-                                         result["id"]["channelId"]))
+            channels.append("{} ({})".format(result["snippet"]["title"],result["id"]["channelId"]))
           elif result["id"]["kind"] == "youtube#playlist":
-            playlists.append("%s (%s)" % (result["snippet"]["title"],
-                                          result["id"]["playlistId"]))
+            playlists.append("{} ({})".format (result["snippet"]["title"],result["id"]["playlistId"]))
 
         print("Videos:\n", "\n".join(videos), "\n")
         print("Channels:\n", "\n".join(channels), "\n")
