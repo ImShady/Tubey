@@ -10,7 +10,7 @@ class Tubey():
     def send_message(self, message):
         raise NotImplemented
 
-    def getClient(self):
+    def get_client(self):
         ### Fetch a cached slack client or create one and return it ###
         if self._client is not None:
             return self._client
