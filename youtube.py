@@ -2,10 +2,13 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from oauth2client.tools import argparser
 
+from lib.config import Config
+
+
 class Youtube():
     """Class that contains all of the youtube API related functions"""
 
-    DEVELOPER_KEY = "AIzaSyAehWCYyOVH40G1uao5TTMv6ITNBq_xbEI"
+    DEVELOPER_KEY = Config.get_variable('youtube_api', 'dev_key')
     YOUTUBE_API_SERVICE_NAME = "youtube"
     YOUTUBE_API_VERSION = "v3"
 
@@ -41,9 +44,7 @@ class Youtube():
         for result in search_results:
 
           if result["id"]["kind"] == "youtube#video":
-
             videos.append("{} ({})".format(result["snippet"]["title"],result["id"]["videoId"]))
-
           elif result["id"]["kind"] == "youtube#channel":
             channels.append("{} ({})".format(result["snippet"]["title"],result["id"]["channelId"]))
           elif result["id"]["kind"] == "youtube#playlist":
