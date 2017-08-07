@@ -4,11 +4,8 @@ from slackclient import SlackClient
 class Tubey():
 
     def __init__(self, **kwargs):
-        # cache the client in memory
+        ### Cache the client in memory ###
         self._client = None
-
-    def send_message(self, message):
-        raise NotImplemented
 
     def get_client(self):
         ### Fetch a cached slack client or create one and return it ###
@@ -20,7 +17,15 @@ class Tubey():
         self._client = sc
         return self._client
 
-if __name__ == "__main__":
+    def send_message(self, message):
+        ### Sends message to the user/channel ###
+        params = {'channel': 'tubeydev', 'text': message}
+        #client = get_client(self)
+        self.get_client().api_call("chat.postMessage", **params)
 
+if __name__ == "__main__":
+    #tubey = Tubey()
+
+    #tubey.send_message("This better work")
     # params = {'channel': 'tubeydev', 'text': "Hi everybody! I'm a faige!"}
     # client.api_call("chat.postMessage", **params)
