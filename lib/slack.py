@@ -25,8 +25,24 @@ class Tubey():
         self._client = sc
         return self._client
 
+    def play_video(self, video_id):
+        # Plays a video in the current channel using the video id
+        video_url = "https://www.youtube.com/watch?v={}".format(video_id)
+        self.send_message(video_url)
+
+    def send_channel(self, channel_id, channel_name, thumbnail_url):
+        # Sends the youtube channel to the active user/slack channel
+        channel_url = "https://www.youtube.com/channel/{}".format(channel_id)
+
+        params = {'channel': 'tubeydev', 'text': "Here's the channel:", 'attachments':
+                  [{'fallback': channel_name + ' thumbnail', 'title': channel_name, "title_link": channel_url,
+                    "image_url": thumbnail_url}]}
+        client = self.get_client()
+        client.api_call("chat.postMessage", **params)
+
 
 if __name__ == "__main__":
 
     tubey = Tubey()
-    tubey.send_message("Sushi is great")
+    tubey.send_channel('UCDWIvJwLJsE4LG1Atne2blQ', 'h3h3Productions',
+                       'https://yt3.ggpht.com/-QWMKBXNBE2E/AAAAAAAAAAI/AAAAAAAAAAA/rEARmBXfgHw/s240-c-k-no-mo-rj-c0xffffff/photo.jpg')
