@@ -7,13 +7,11 @@ class Tubey():
         # Cache the client in memory
         self._client = None
 
-
     def send_message(self, message):
         # Sends message to the user/channel
         params = {'channel': 'tubeydev', 'text': message}
         client = self.get_client()
         client.api_call("chat.postMessage", **params)
-
 
     def get_client(self):
         # Fetch a cached slack client or create one and return it
@@ -24,7 +22,6 @@ class Tubey():
         sc = SlackClient(token)
         self._client = sc
         return self._client
-
 
 if __name__ == "__main__":
 
