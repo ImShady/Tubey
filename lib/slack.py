@@ -8,14 +8,11 @@ class Tubey():
         self._client = None
 
 
-    def send_message(self, message, params= None):
+    def send_message(self, message, params= {'channel': 'tubeydev'}):
         # Sends message to the user/channel
         client = self.get_client()
-        if params:
-            client.api_call("chat.postMessage", **params)
-        else:
-            default_params = {'channel': 'tubeydev', 'text': message}
-            client.api_call("chat.postMessage", **default_params)
+        params["text"] = message
+        client.api_call("chat.postMessage", **params)
 
 
     def get_client(self):
