@@ -25,7 +25,8 @@ class Tubey():
     def send_video(self, video_id):
         # Sends a video in the current channel using the video id
         video_url = "https://www.youtube.com/watch?v={}".format(video_id)
-        self.send_message(video_url)
+        params = {"channel": "tubeydev", "text": video_url}
+        self.send_message(params)
 
     def send_channel(self, channel_id, channel_name, thumbnail_url):
         # Sends the youtube channel to the active user/slack channel
@@ -40,3 +41,4 @@ if __name__ == "__main__":
     tubey = Tubey()
     tubey.send_channel('UCDWIvJwLJsE4LG1Atne2blQ', 'h3h3Productions',
                        'https://yt3.ggpht.com/-QWMKBXNBE2E/AAAAAAAAAAI/AAAAAAAAAAA/rEARmBXfgHw/s240-c-k-no-mo-rj-c0xffffff/photo.jpg')
+    tubey.send_video("8SFOWAIqYE4")
