@@ -1,22 +1,45 @@
-from youtube import Youtube
+from flask import request, jsonify, abort, Flask
+from lib.config import Config
 
+# Detailed documentation of Slack slash commands:
+# https://api.slack.com/slash-commands
 
-youtube_client = Youtube()
-youtube_client.query("h3h3productions")
+app = Flask(__name__)
 
-# from urllib.parse import quote
-# from urllib.request import urlopen
-# from bs4 import BeautifulSoup
-#
-# def search_youtube(search_query):
-#
-#     query = quote(search_query)
-#     url = "https://www.youtube.com/results?search_query=" + query
-#     response = urlopen(url)
-#     html = response.read()
-#     soup = BeautifulSoup(html, "html5lib")
-#     for vid in soup.findAll(attrs={'class':'yt-uix-tile-link'}):
-#         print('https://www.youtube.com' + vid['href'])
-#
-#
-# search_youtube("h3h3productions")
+# The parameters included in a slash command request (with example values):
+#   token=gIkuvaNzQIHg97ATvDxqgjtO
+#   team_id=T0001
+#   team_domain=example
+#   channel_id=C2147483705
+#   channel_name=test
+#   user_id=U2147483697
+#   user_name=Steve
+#   command=/weather
+#   text=94070
+#   response_url=https://hooks.slack.com/commands/1234/5678
+
+@app.route('/tubey', methods=['POST'])
+def slash_command():
+    # Parse the command parameters, validate them, and respond
+    token = request.form.get('token', None)
+    # command = request.form.get('command', None) -- may eventually need this
+    text = request.form.get('text', None)
+
+    verif_token = Config.get_variable('tubey', 'verif_token')
+
+    # Validate the request parameters
+    if token != verif_token:
+        abort(401) # Unauthorized request. If you're not Slack, go away
+
+    # See api.slack.com/docs/formatting and api.slack.com/docs/attachments to send richly formatted messages
+    return jsonify({
+        'response_type': 'in_channel',
+        'text': "Look at me I'm responding from the server!",
+        'attachments': []
+    })
+
+if __name__ == "__main__":
+    context = (Config.get_variable('ssl_cert', 'chain'), Config.get_variable('ssl_cert', 'privkey'))
+    host = Config.get_variable('server_details', 'host')
+    port = int(Config.get_variable('server_details', 'port'))
+    app.run(port=port, host=host , ssl_context=context, debug=True)
