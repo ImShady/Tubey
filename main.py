@@ -33,7 +33,7 @@ def slash_command():
         abort(401) # Unauthorized request. If you're not Slack, go away
 
     tubey = Tubey()
-    videos = tubey.search()
+    videos = tubey.search(text)
 
     suggestion = jsonify({'response_type': 'ephemeral', 'text': videos[0]})
 
