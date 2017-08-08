@@ -35,7 +35,24 @@ def slash_command():
     tubey = Tubey()
     videos = tubey.search(text)
 
-    suggestion = jsonify({'response_type': 'ephemeral', 'text': videos[0]})
+    suggestion = jsonify(
+        {'response_type': 'in_channel',
+         'text': "https://www.youtube.com/watch?v={}".format(videos[0]['id']),
+         "actions": [
+             {
+                 "name": "submit",
+                 "text": "Send",
+                 "type": "button",
+                 "styke": "primary",
+                 "value": "send"
+             },
+             {
+                 "name": "cancel",
+                 "text": "Cancel",
+                 "type": "button",
+                 "value": "cancel"
+             }
+         ]})
 
     # See api.slack.com/docs/formatting and api.slack.com/docs/attachments to send richly formatted messages
     return suggestion

@@ -44,15 +44,9 @@ class Youtube():
         for result in search_results:
 
           if result["id"]["kind"] == "youtube#video":
-            videos.append("{} ({})".format(result["snippet"]["title"],result["id"]["videoId"]))
+            videos.append({'title': result["snippet"]["title"], 'id': result["id"]["videoId"]})
           elif result["id"]["kind"] == "youtube#channel":
-            channels.append("{} ({})".format(result["snippet"]["title"],result["id"]["channelId"]))
-          elif result["id"]["kind"] == "youtube#playlist":
-            playlists.append("{} ({})".format (result["snippet"]["title"],result["id"]["playlistId"]))
-
-        #print("Videos:\n", "\n".join(videos), "\n")
-        #print("Channels:\n", "\n".join(channels), "\n")
-        #print("Playlists:\n", "\n".join(playlists), "\n")
+            channels.append({'title': result["snippet"]["title"], 'id': result["id"]["channelId"]})
 
         results = {"videos": videos, "channels": channels}
 
