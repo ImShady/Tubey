@@ -7,7 +7,7 @@ class Tubey():
         # Cache the client in memory
         self._client = None
 
-    def send_message(self, params = {'channel': 'tubeydev', 'text': "If you're reading this, it's already too late"}):
+    def send_message(self, params):
         # Sends message to the user/channel
         client = self.get_client()
         client.api_call("chat.postMessage", **params)
@@ -25,18 +25,25 @@ class Tubey():
     def send_video(self, video_id):
         # Sends a video in the current channel using the video id
         video_url = "https://www.youtube.com/watch?v={}".format(video_id)
-        self.send_message(video_url)
+        self.send_message({'channel': 'tubeydev', 'text': video_url})
 
     def send_channel(self, channel_id, channel_name, thumbnail_url):
         # Sends the youtube channel to the active user/slack channel
         channel_url = "https://www.youtube.com/channel/{}".format(channel_id)
-        params = {'channel': 'tubeydev', 'text': "Here's the channel:", 'attachments':
-                  [{'fallback': channel_name + ' thumbnail', 'title': channel_name, "title_link": channel_url, "image_url": thumbnail_url}]}
-
+        params = {'channel': 'tubeydev',
+                  'text': "Here's the channel:",
+                  'attachments': [
+                      {'fallback': channel_name + ' thumbnail',
+                       'title': channel_name,
+                       "title_link": channel_url,
+                       "image_url": thumbnail_url
+                       }]
+                  }
         self.send_message(params)
 
 if __name__ == "__main__":
 
     tubey = Tubey()
-    tubey.send_channel('UCDWIvJwLJsE4LG1Atne2blQ', 'h3h3Productions',
-                       'https://yt3.ggpht.com/-QWMKBXNBE2E/AAAAAAAAAAI/AAAAAAAAAAA/rEARmBXfgHw/s240-c-k-no-mo-rj-c0xffffff/photo.jpg')
+    tubey.send_video('aGAxKpNWIA0')
+    thumbnail = 'https://yt3.ggpht.com/-QWMKBXNBE2E/AAAAAAAAAAI/AAAAAAAAAAA/rEARmBXfgHw/s240-c-k-no-mo-rj-c0xffffff/photo.jpg'
+    tubey.send_channel('UCDWIvJwLJsE4LG1Atne2blQ', 'h3h3Productions', thumbnail)
