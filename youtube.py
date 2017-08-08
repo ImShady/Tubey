@@ -54,7 +54,7 @@ class Youtube():
         #print("Channels:\n", "\n".join(channels), "\n")
         #print("Playlists:\n", "\n".join(playlists), "\n")
 
-        results = {"videos": videos, "channels": channels, "playlists": playlists}
+        results = {"videos": videos, "channels": channels}
 
         return results
 
