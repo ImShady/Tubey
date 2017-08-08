@@ -1,5 +1,6 @@
 from flask import request, jsonify, abort, Flask
 from lib.config import Config
+from lib.slack import Tubey
 
 # Detailed documentation of Slack slash commands:
 # https://api.slack.com/slash-commands
