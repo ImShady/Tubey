@@ -31,12 +31,18 @@ def slash_command():
     if token != verif_token:
         abort(401) # Unauthorized request. If you're not Slack, go away
 
+    tubey = Tubey()
+    videos = tubey.search()
+
+    suggestion = jsonify({'response_type': 'ephemeral', 'text': videos[0]})
+
     # See api.slack.com/docs/formatting and api.slack.com/docs/attachments to send richly formatted messages
-    return jsonify({
-        'response_type': 'in_channel',
-        'text': "Look at me I'm responding from the server!",
-        'attachments': []
-    })
+    return suggestion
+    # return jsonify({
+    #     'response_type': 'in_channel',
+    #     'text': "Look at me I'm responding from the server!",
+    #     'attachments': []
+    # })
 
 if __name__ == "__main__":
     context = (Config.get_variable('ssl_cert', 'chain'), Config.get_variable('ssl_cert', 'privkey'))

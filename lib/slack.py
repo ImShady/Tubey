@@ -1,5 +1,6 @@
 from lib.config import Config
 from slackclient import SlackClient
+from youtube import Youtube
 
 class Tubey():
 
@@ -40,6 +41,13 @@ class Tubey():
                        }]
                   }
         self.send_message(params)
+
+    def search(self, search_query):
+        youtube = Youtube()
+        results = youtube.query(search_query)
+
+        return results['videos']
+
 
 if __name__ == "__main__":
 
