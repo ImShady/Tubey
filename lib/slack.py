@@ -8,10 +8,9 @@ class Tubey():
         self._client = None
 
 
-    def send_message(self, message, params= {'channel': 'tubeydev'}):
+    def send_message(self, params = {'channel': 'tubeydev', 'text': "If you're reading this, it's already too late"}):
         # Sends message to the user/channel
         client = self.get_client()
-        params["text"] = message
         client.api_call("chat.postMessage", **params)
 
 
@@ -36,7 +35,7 @@ class Tubey():
         params = {'channel': 'tubeydev', 'text': "Here's the channel:", 'attachments':
                   [{'fallback': channel_name + ' thumbnail', 'title': channel_name, "title_link": channel_url, "image_url": thumbnail_url}]}
 
-        self.send_message(params['text'], params)
+        self.send_message(params)
 
 
 if __name__ == "__main__":
