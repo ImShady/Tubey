@@ -37,24 +37,33 @@ def slash_command():
 
     suggestion = jsonify(
         {'response_type': 'in_channel',
+         'text': "https://www.youtube.com/watch?v={}".format(videos[0]['id']),
          "attachments": [
              {
-                 'text': "https://www.youtube.com/watch?v={}".format(videos[0]['id']),
                  "fallback": "You did not choose a video to send.",
                  "color": "#CD201F",
                  "attachment_type": "default",
                  "actions": [
-                     {"name": "submit",
-                     "text": "Send",
-                     "type": "button",
-                     "styke": "primary",
-                     "value": "send"
-                    },
-                    {"name": "cancel",
-                     "text": "Cancel",
-                     "type": "button",
-                     "value": "cancel"
-                    }]
+                     {
+                         "name": "submit",
+                        "text": "Send",
+                        "type": "button",
+                        "styke": "primary",
+                        "value": "send"
+                     },
+                     {
+                         "name": "shuffle",
+                         "text": "Shuffle",
+                         "type": "button",
+                         "value": "shuffle"
+                     },
+                     {
+                         "name": "cancel",
+                         "text": "Cancel",
+                         "type": "button",
+                         "value": "cancel"
+                     },
+                 ]
              }]
          })
 
