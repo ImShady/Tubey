@@ -1,10 +1,32 @@
 from lib.config import Config
 from slackclient import SlackClient
 from youtube import Youtube
+from random import randint
+from datetime import datetime
 
 class Tubey():
 
-    def __init__(self, **kwargs):
+    buttons = [{
+                    "name": "send",
+                    "text": "Send",
+                    "type": "button",
+                    "style": "primary",
+                    "value": "Send that pineapple"
+                },
+                {
+                    "name": "shuffle",
+                    "text": "Shuffle",
+                    "type": "button",
+                    "value": "Shuffle it up!"
+                },
+                {
+                    "name": "cancel",
+                    "text": "Cancel",
+                    "type": "button",
+                    "value": "Cancel dis plz"
+                 }]
+
+    def __init__(self):
         # Cache the client in memory
         self._client = None
 
@@ -23,10 +45,59 @@ class Tubey():
         self._client = sc
         return self._client
 
-    def send_video(self, video_id):
-        # Sends a video in the current channel using the video id
-        video_url = "https://www.youtube.com/watch?v={}".format(video_id)
-        self.send_message({'channel': 'tubeydev', 'text': video_url})
+    def suggest_video(self, query, channel, user, is_shuffle):
+        # Sends a video suggestion in an ephemeral message
+        videos = self.search(query)
+        num_vids = len(videos)
+        suggested_video = videos[randint(0, num_vids) % num_vids]
+
+        published_date = datetime.strptime(suggested_video['snippet']['publishedAt'][0:10], "%Y-%m-%d").date().strftime(
+            '%B %d, %Y')
+        channel_name = suggested_video['snippet']['channelTitle']
+        video_title = suggested_video['snippet']['title']
+        description = suggested_video['snippet']['description']
+        thumbnail = suggested_video['snippet']['thumbnails']['high']['url']
+        id = suggested_video['id']['videoId']
+
+        self.buttons[0]['value'] = id
+        self.buttons[1]['value'] = query
+
+        params = {
+            'unfurl_links': False,
+            'channel': channel,
+            'user': user,
+            "attachments": [{
+                "title": "Video title: {}".format(video_title),
+                "text": "Channel name: {}\nPublished date: {}\nVideo description: {}".format(channel_name, published_date, description),
+                "title_link": "https://www.youtube.com/watch?v=".format(id),
+                "image_url": thumbnail,
+                "fallback": "You need to upgrade your Slack client to use this command!",
+                "color": "#CD201F",
+                "attachment_type": "default",
+                "actions": self.buttons,
+                "callback_id": "primary_menu"
+            }]
+        }
+
+        if is_shuffle:
+            params['replace_original'] = True
+            return params
+        else:
+            client = self.get_client()
+            response = client.api_call("chat.postEphemeral", **params)
+            print(response)
+
+    def send_video(self, video_id, channel):
+        # Sends a chosen video to the channel
+        params =  {
+            "channel": channel,
+            "text": "https://www.youtube.com/watch?v={}".format(video_id)
+        }
+
+        response = self.send_message(params)
+        print(response)
+
+        return { "delete_original": True }
 
     def send_channel(self, channel_id, channel_name, thumbnail_url):
         # Sends the youtube channel to the active user/slack channel
@@ -50,8 +121,6 @@ class Tubey():
 
 
 if __name__ == "__main__":
+    # Should probably put a legitimate sample run here...I'll start it off
+    pass
 
-    tubey = Tubey()
-    tubey.send_video('aGAxKpNWIA0')
-    thumbnail = 'https://yt3.ggpht.com/-QWMKBXNBE2E/AAAAAAAAAAI/AAAAAAAAAAA/rEARmBXfgHw/s240-c-k-no-mo-rj-c0xffffff/photo.jpg'
-    tubey.send_channel('UCDWIvJwLJsE4LG1Atne2blQ', 'h3h3Productions', thumbnail)
