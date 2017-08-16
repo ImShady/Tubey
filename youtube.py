@@ -1,6 +1,6 @@
 from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
-from oauth2client.tools import argparser
+import json
+import argparse
 
 from lib.config import Config
 
@@ -13,9 +13,10 @@ class Youtube():
     YOUTUBE_API_VERSION = "v3"
 
     def query(self, search_query):
-        argparser.add_argument("--q", help="Search term", default=search_query)
-        argparser.add_argument("--max-results", help="Max results", default=25)
-        args = argparser.parse_args()
+        parser = argparse.ArgumentParser(prog='PROG', conflict_handler='resolve')
+        parser.add_argument("--q", help="Search term", default=search_query)
+        parser.add_argument("--max-results", help="Max results", default=25)
+        args = parser.parse_args()
         options = args
         youtube = build(self.YOUTUBE_API_SERVICE_NAME, self.YOUTUBE_API_VERSION,
           developerKey=self.DEVELOPER_KEY)
@@ -30,7 +31,6 @@ class Youtube():
 
         videos = []
         channels = []
-        playlists = []
         search_results = []
 
         try:
@@ -40,13 +40,13 @@ class Youtube():
             print(e)
 
         # Add each result to the appropriate list, and then display the lists of
-        # matching videos, channels, and playlists.
+        # matching videos, and channels
         for result in search_results:
 
           if result["id"]["kind"] == "youtube#video":
-            videos.append({'title': result["snippet"]["title"], 'id': result["id"]["videoId"]})
+              videos.append(result)
           elif result["id"]["kind"] == "youtube#channel":
-            channels.append({'title': result["snippet"]["title"], 'id': result["id"]["channelId"]})
+              channels.append(result)
 
         results = {"videos": videos, "channels": channels}
 
@@ -55,11 +55,5 @@ class Youtube():
 
 if __name__ == "__main__":
     youtube = Youtube()
-    argparser.add_argument("--q", help="Search term", default="Google")
-    argparser.add_argument("--max-results", help="Max results", default=25)
-    args = argparser.parse_args()
-
-    try:
-        youtube.query(args)
-    except HttpError as e:
-      print("An HTTP error %d occurred:\n%s") % (e.resp.status, e.content)
+    results = youtube.query("rick and morty")
+    print(results['videos'])
