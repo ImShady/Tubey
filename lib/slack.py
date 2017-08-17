@@ -22,7 +22,7 @@ class Tubey():
                 {
                     "name": "cancel",
                     "text": "Cancel",
-                    "type": "button",
+                    "type": "danger",
                     "value": "Cancel dis plz"
                  }]
 
@@ -97,7 +97,7 @@ class Tubey():
         response = self.send_message(params)
         print(response)
 
-        return { "delete_original": True }
+        return {"delete_original": True}
 
     def send_channel(self, channel_id, channel_name, thumbnail_url):
         # Sends the youtube channel to the active user/slack channel
@@ -123,4 +123,3 @@ class Tubey():
 if __name__ == "__main__":
     # Should probably put a legitimate sample run here...I'll start it off
     pass
-
