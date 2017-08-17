@@ -28,8 +28,6 @@ def slash_command():
     token = request.form.get('token', None)
     print(request.form)
 
-    tubey = Tubey()
-
     tubey.verify_token(token)
 
     channel = request.form.get('channel_id', None)
@@ -44,8 +42,6 @@ def slash_command():
 def button_click():
     payload = json.loads(request.form.get('payload', None))
     print(payload)
-
-    tubey = Tubey()
 
     tubey.verify_token(payload['token'])
 
@@ -64,7 +60,6 @@ def button_click():
         result = {"delete_original": True}
 
     return jsonify(result)
-
 
 if __name__ == "__main__":
     context = (Config.get_variable('ssl_cert', 'chain'), Config.get_variable('ssl_cert', 'privkey'))
