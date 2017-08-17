@@ -32,30 +32,30 @@ class Tubey():
         # Cache the client in memory
         self._bot_client = None
         self._user_client = None
-        self.clients = {'bot': self._bot_client, 'user': self._user_client}
+        self._clients = {'bot': self._bot_client, 'user': self._user_client}
 
     def send_message(self, params, type="Message"):
         # Sends message to the user/channel
         # Type should either be Message or Ephemeral
         if 'as_user' in params.keys() and params['as_user']:
-            client = self.get_client(type='user')
+            _client = self.get_client(type='user')
         else:
-            client = self.get_client(type='bot')
+            _client = self.get_client(type='bot')
 
-        client.api_call("chat.post" + type, **params)
+        _client.api_call("chat.post" + type, **params)
 
     def get_client(self, type='bot'):
         # Fetch a cached slack client or create one and return it
         # type is either 'bot' or 'user'
-        if self.clients[type] is not None:
-            return self.clients[type]
+        if self._clients[type] is not None:
+            return self._clients[type]
 
         print("NEW CLIENT ALERT FOR: ", type)
 
-        token = Config.get_variable('tubey', type + '_oauth_token')
-        sc = SlackClient(token)
-        self.clients[type] = sc
-        return sc
+        _token = Config.get_variable('tubey', type + '_oauth_token')
+        _sc = SlackClient(_token)
+        self._clients[type] = _sc
+        return _sc
 
     def suggest_video(self, query, channel, user, is_shuffle):
         # Sends a video suggestion in an ephemeral message
