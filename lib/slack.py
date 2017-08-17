@@ -1,5 +1,6 @@
 from lib.config import Config
 from slackclient import SlackClient
+from flask import abort
 from youtube import Youtube
 from random import randint
 from datetime import datetime
@@ -120,6 +121,12 @@ class Tubey():
 
         return results['videos']
 
+    def verify_token(self, token):
+        verif_token = Config.get_variable('tubey', 'verif_token')
+
+        # Validate the request parameters
+        if token != verif_token:
+            abort(401)  # Unauthorized request. If you're not Slack, go away
 
 if __name__ == "__main__":
     # Should probably put a legitimate sample run here...I'll start it off

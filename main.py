@@ -1,4 +1,4 @@
-from flask import request, jsonify, abort, Flask, make_response
+from flask import request, jsonify, Flask, make_response
 from lib.config import Config
 from lib.slack import Tubey
 import json
@@ -26,17 +26,13 @@ tubey = Tubey()
 def slash_command():
     # Parse the command parameters, validate them, and respond
     token = request.form.get('token', None)
-    verif_token = Config.get_variable('tubey', 'verif_token')
     print(request.form)
 
-    # Validate the request parameters
-    if token != verif_token:
-        abort(401)  # Unauthorized request. If you're not Slack, go away
+    tubey.verify_token(token)
 
     channel = request.form.get('channel_id', None)
     user = request.form.get('user_id', None)
     text = request.form.get('text', None)
-
 
     tubey.suggest_video(text, channel, user, is_shuffle=False)
 
@@ -47,10 +43,7 @@ def button_click():
     payload = json.loads(request.form.get('payload', None))
     print(payload)
 
-    verif_token = Config.get_variable('tubey', 'verif_token')
-
-    if payload['token'] != verif_token:
-        abort(401)
+    tubey.verify_token(payload['token'])
 
     button = payload['actions'][0]
     button_type = button['name']
