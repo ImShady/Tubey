@@ -32,19 +32,23 @@ class Tubey():
         # Cache the client in memory
         self._client = None
 
-    def send_message(self, params, type="Message", as_user=False):
+    def send_message(self, params, type="Message"):
         # Sends message to the user/channel
         # Type should either be Message or Ephemeral
-        client = self.get_client()
-        params['as_user'] = as_user
+        if 'as_user' in params.keys():
+            client = self.get_client(type='client')
+        else:
+            client = self.get_client(type='bot')
+
         client.api_call("chat.post" + type, **params)
 
-    def get_client(self):
+    def get_client(self, type='bot'):
         # Fetch a cached slack client or create one and return it
+        # type is either 'bot' or 'client'
         if self._client is not None:
             return self._client
 
-        token = Config.get_variable('tubey', 'bot_oauth_token')
+        token = Config.get_variable('tubey', type + '_ouath_token')
         sc = SlackClient(token)
         self._client = sc
         return self._client
@@ -94,10 +98,11 @@ class Tubey():
         # Sends a chosen video to the channel
         params =  {
             "channel": channel,
-            "text": "https://www.youtube.com/watch?v={}".format(video_id)
+            "text": "https://www.youtube.com/watch?v={}".format(video_id),
+            "as_user": True
         }
 
-        response = self.send_message(params, as_user=True)
+        response = self.send_message(params)
         print(response)
 
         return {"delete_original": True}
