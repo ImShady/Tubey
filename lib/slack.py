@@ -30,13 +30,15 @@ class Tubey():
 
     def __init__(self):
         # Cache the client in memory
-        self._client = None
+        self._bot_client = None
+        self._user_client = None
+        self.clients = {'bot': self._bot_client, 'user': self._user_client}
 
     def send_message(self, params, type="Message"):
         # Sends message to the user/channel
         # Type should either be Message or Ephemeral
-        if 'as_user' in params.keys():
-            client = self.get_client(type='client')
+        if 'as_user' in params.keys() and params['as_user']:
+            client = self.get_client(type='user')
         else:
             client = self.get_client(type='bot')
 
@@ -44,14 +46,16 @@ class Tubey():
 
     def get_client(self, type='bot'):
         # Fetch a cached slack client or create one and return it
-        # type is either 'bot' or 'client'
-        if self._client is not None:
-            return self._client
+        # type is either 'bot' or 'user'
+        if self.clients[type] is not None:
+            return self.clients[type]
+
+        print("NEW CLIENT ALERT FOR: ", type)
 
         token = Config.get_variable('tubey', type + '_oauth_token')
         sc = SlackClient(token)
-        self._client = sc
-        return self._client
+        self.clients[type] = sc
+        return sc
 
     def suggest_video(self, query, channel, user, is_shuffle):
         # Sends a video suggestion in an ephemeral message
@@ -103,7 +107,6 @@ class Tubey():
         }
 
         response = self.send_message(params)
-        print(response)
 
         return {"delete_original": True}
 
