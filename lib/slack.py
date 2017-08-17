@@ -32,10 +32,11 @@ class Tubey():
         # Cache the client in memory
         self._client = None
 
-    def send_message(self, params, type="Message"):
+    def send_message(self, params, type="Message", as_user=False):
         # Sends message to the user/channel
         # Type should either be Message or Ephemeral
         client = self.get_client()
+        params['as_user'] = as_user
         client.api_call("chat.post" + type, **params)
 
     def get_client(self):
@@ -96,7 +97,7 @@ class Tubey():
             "text": "https://www.youtube.com/watch?v={}".format(video_id)
         }
 
-        response = self.send_message(params)
+        response = self.send_message(params, as_user=True)
         print(response)
 
         return {"delete_original": True}
