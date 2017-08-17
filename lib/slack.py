@@ -22,7 +22,8 @@ class Tubey():
                 {
                     "name": "cancel",
                     "text": "Cancel",
-                    "type": "danger",
+                    "type": "button",
+                    "style": "danger",
                     "value": "Cancel dis plz"
                  }]
 
