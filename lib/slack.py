@@ -48,7 +48,7 @@ class Tubey():
         if self._client is not None:
             return self._client
 
-        token = Config.get_variable('tubey', type + '_ouath_token')
+        token = Config.get_variable('tubey', type + '_oauth_token')
         sc = SlackClient(token)
         self._client = sc
         return self._client
