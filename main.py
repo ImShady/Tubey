@@ -64,8 +64,7 @@ def button_click():
     elif button_type == 'send':
         result = tubey.send_video(channel=payload['channel']['id'], video_id=button_value)
     elif button_type == 'cancel':
-        #TODO: Implement cancel
-        print("write me plz")
+        result = {"delete_original": True}
 
     return jsonify(result)
 
