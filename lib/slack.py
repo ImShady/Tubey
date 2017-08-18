@@ -91,11 +91,11 @@ class Tubey():
             response = self.send_message(params, type="Ephemeral")
             print(response)
 
-    def send_video(self, video_id, channel):
+    def send_video(self, user, video_id, channel):
         # Sends a chosen video to the channel
         params =  {
             "channel": channel,
-            "text": "https://www.youtube.com/watch?v={}".format(video_id)
+            "text": "<!{}> shared a video!\nhttps://www.youtube.com/watch?v={}".format(user, video_id)
         }
 
         response = self.send_message(params)
