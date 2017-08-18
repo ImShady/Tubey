@@ -37,15 +37,15 @@ class Tubey():
         # Type should either be Message or Ephemeral
 
         client = self.__get_client__()
-        client.api_call("chat.post" + type, **params)
+        return client.api_call("chat.post" + type, **params)
 
-    def __get_client__(self, type='bot'):
+    def __get_client__(self):
         # Fetch a cached slack client or create one and return it
         # type is either 'bot' or 'user'
         if self._client is not None:
             return self._client
 
-        token = Config.get_variable('tubey', 'bot_oauth_token')
+        token = Config.get_variable('tubey', 'oauth_token')
         sc = SlackClient(token)
         self._client = sc
         return sc
