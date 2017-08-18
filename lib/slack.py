@@ -30,31 +30,24 @@ class Tubey():
 
     def __init__(self):
         # Cache the client in memory
-        self._bot_client = None
-        self._user_client = None
-        self._clients = {'bot': self._bot_client, 'user': self._user_client}
+        self._client = None
 
     def send_message(self, params, type="Message"):
         # Sends message to the user/channel
         # Type should either be Message or Ephemeral
-        if 'as_user' in params.keys() and params['as_user']:
-            client = self.get_client(type='user')
-        else:
-            client = self.get_client(type='bot')
 
+        client = self.__get_client__()
         client.api_call("chat.post" + type, **params)
 
-    def get_client(self, type='bot'):
+    def __get_client__(self, type='bot'):
         # Fetch a cached slack client or create one and return it
         # type is either 'bot' or 'user'
-        if self._clients[type] is not None:
-            return self._clients[type]
+        if self._client is not None:
+            return self._client
 
-        print("NEW CLIENT ALERT FOR: ", type)
-
-        token = Config.get_variable('tubey', type + '_oauth_token')
+        token = Config.get_variable('tubey', 'bot_oauth_token')
         sc = SlackClient(token)
-        self._clients[type] = sc
+        self._client = sc
         return sc
 
     def suggest_video(self, query, channel, user, is_shuffle):
@@ -102,8 +95,7 @@ class Tubey():
         # Sends a chosen video to the channel
         params =  {
             "channel": channel,
-            "text": "https://www.youtube.com/watch?v={}".format(video_id),
-            "as_user": True
+            "text": "https://www.youtube.com/watch?v={}".format(video_id)
         }
 
         response = self.send_message(params)
@@ -112,13 +104,12 @@ class Tubey():
 
     def send_channel(self, channel_id, channel_name, thumbnail_url):
         # Sends the youtube channel to the active user/slack channel
-        channel_url = "https://www.youtube.com/channel/{}".format(channel_id)
         params = {'channel': 'tubeydev',
                   'text': "Here's the channel:",
                   'attachments': [
                       {'fallback': channel_name + ' thumbnail',
                        'title': channel_name,
-                       "title_link": channel_url,
+                       "title_link": "https://www.youtube.com/channel/{}".format(channel_id),
                        "image_url": thumbnail_url
                        }]
                   }
