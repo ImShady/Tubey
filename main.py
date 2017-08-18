@@ -55,7 +55,7 @@ def button_click():
         text = button_value
         result = tubey.suggest_video(text, payload['channel']['id'], payload['user']['id'], is_shuffle=True)
     elif button_type == 'send':
-        result = tubey.send_video(channel=payload['channel']['id'], user=payload['user']['name'], video_id=button_value)
+        result = tubey.send_video(user=payload['user']['name'], video_id=button_value, channel=payload['channel']['id'])
     elif button_type == 'cancel':
         result = {"delete_original": True}
 

@@ -95,7 +95,8 @@ class Tubey():
         # Sends a chosen video to the channel
         params =  {
             "channel": channel,
-            "text": "<!{}> shared a video!\nhttps://www.youtube.com/watch?v={}".format(user, video_id)
+            "text": "@{} shared a video!\nhttps://www.youtube.com/watch?v={}".format(user, video_id),
+            "link_names": True
         }
 
         response = self.send_message(params)
