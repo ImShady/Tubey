@@ -38,8 +38,9 @@ class Tubey():
                  }]
 
     def __init__(self):
-        # Cache the client in memory
+        # Cache the client and the video dict in memory
         self._client = None
+        self.videos = {}
 
     def send_message(self, params, type="Message"):
         # Sends message to the user/channel
@@ -61,8 +62,10 @@ class Tubey():
 
     def suggest_video(self, query, channel, user, is_shuffle, is_next, index=0):
         # Sends a video suggestion in an ephemeral message
-        videos = self.search(query)
-        num_vids = len(videos)
+        if index == 0:
+            self.videos = self.search(query)
+
+        num_vids = len(self.videos)
 
         if is_shuffle:
             index = randint(0, num_vids) % num_vids
@@ -71,7 +74,7 @@ class Tubey():
         elif index == num_vids:
             index = 0
 
-        suggested_video = videos[index]
+        suggested_video = self.videos[index]
 
         published_date = datetime.strptime(suggested_video['snippet']['publishedAt'][0:10], "%Y-%m-%d").date().strftime(
             '%B %d, %Y')
