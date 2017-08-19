@@ -68,7 +68,7 @@ class Tubey():
             index = randint(0, num_vids) % num_vids
         elif is_next:
             index += 1
-        elif index == num_vids:
+        elif index > num_vids:
             index = 0
 
         suggested_video = videos[index]
