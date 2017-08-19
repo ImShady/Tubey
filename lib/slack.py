@@ -15,10 +15,19 @@ class Tubey():
                     "value": "Send that pineapple"
                 },
                 {
+                    "name": "next",
+                    "text": "Next",
+                    "type": "button",
+                    "style": "info",
+                    "value": "NEXT!",
+                    "index": "Guess we'll find out"
+                },
+                {
                     "name": "shuffle",
                     "text": "Shuffle",
                     "type": "button",
-                    "value": "Shuffle it up!"
+                    "value": "Shuffle it up!",
+                    "index": "Guess we'll find out"
                 },
                 {
                     "name": "cancel",
@@ -50,11 +59,19 @@ class Tubey():
         self._client = sc
         return sc
 
-    def suggest_video(self, query, channel, user, is_shuffle):
+    def suggest_video(self, query, channel, user, is_shuffle, is_next, index=0):
         # Sends a video suggestion in an ephemeral message
         videos = self.search(query)
         num_vids = len(videos)
-        suggested_video = videos[randint(0, num_vids) % num_vids]
+
+        if is_shuffle:
+            index = randint(0, num_vids) % num_vids
+        elif is_next:
+            index += 1
+        elif index == num_vids:
+            index = 0
+
+        suggested_video = videos[index]
 
         published_date = datetime.strptime(suggested_video['snippet']['publishedAt'][0:10], "%Y-%m-%d").date().strftime(
             '%B %d, %Y')
@@ -66,6 +83,10 @@ class Tubey():
 
         self.buttons[0]['value'] = id
         self.buttons[1]['value'] = query
+        self.buttons[2]['value'] = query
+        self.buttons[1]['index'] = index
+        self.buttons[2]['index'] = index
+
 
         params = {
             'unfurl_links': False,
@@ -84,7 +105,7 @@ class Tubey():
             }]
         }
 
-        if is_shuffle:
+        if is_shuffle or is_next:
             params['replace_original'] = True
             return params
         else:
