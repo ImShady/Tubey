@@ -55,9 +55,9 @@ def button_click():
     result = {}
 
     if button_type == 'shuffle':
-        result = tubey.suggest_video(query, payload['channel']['id'], payload['user']['id'], is_shuffle=True, index=button_value)
+        result = tubey.suggest_video(query, payload['channel']['id'], payload['user']['id'], is_shuffle=True, iindex=int(button_value))
     elif button_type == 'next':
-        result = tubey.suggest_video(query, payload['channel']['id'], payload['user']['id'], is_next=True, index=button_value)
+        result = tubey.suggest_video(query, payload['channel']['id'], payload['user']['id'], is_next=True, index=int(button_value))
     elif button_type == 'send':
         result = tubey.send_video(user=payload['user']['name'], video_id=button_value, channel=payload['channel']['id'])
     elif button_type == 'cancel':

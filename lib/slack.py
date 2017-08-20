@@ -68,7 +68,7 @@ class Tubey():
         if is_shuffle:
             index = randint(0, num_vids) % num_vids
         elif is_next:
-            index += 1
+            index = int(index) + 1
         elif index == num_vids:
             index = 0
 
@@ -83,8 +83,8 @@ class Tubey():
         id = suggested_video['id']['videoId']
 
         self.buttons[0]['value'] = id
-        self.buttons[1]['value'] = index
-        self.buttons[2]['value'] = index
+        self.buttons[1]['value'] = str(index)
+        self.buttons[2]['value'] = str(index)
 
         params = {
             'unfurl_links': False,
