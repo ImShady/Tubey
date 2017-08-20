@@ -100,7 +100,7 @@ class Tubey():
 
     def suggest_video(self, user_info, team_info, channel_info, query="", action_info={}):
         # Sends a video suggestion in an ephemeral message
-        if action_info['name'] == 'shuffle':
+        if 'name' in action_info.keys() and action_info['name'] == 'shuffle':
             button_value = loads(action_info['value'])
             search_id = button_value['search_id']
             channel = channel_info['id']
