@@ -19,15 +19,13 @@ class Tubey():
                     "text": "Next",
                     "type": "button",
                     "style": "info",
-                    "value": "NEXT!",
-                    "index": "Guess we'll find out"
+                    "value": "NEXT!"
                 },
                 {
                     "name": "shuffle",
                     "text": "Shuffle",
                     "type": "button",
-                    "value": "Shuffle it up!",
-                    "index": "Guess we'll find out"
+                    "value": "Shuffle it up!"
                 },
                 {
                     "name": "cancel",
@@ -60,7 +58,7 @@ class Tubey():
         self._client = sc
         return sc
 
-    def suggest_video(self, query, channel, user, is_shuffle, is_next, index=0):
+    def suggest_video(self, query, channel, user, is_shuffle=False, is_next=False, index=0):
         # Sends a video suggestion in an ephemeral message
         if index == 0:
             self.videos = self.search(query)
@@ -85,11 +83,8 @@ class Tubey():
         id = suggested_video['id']['videoId']
 
         self.buttons[0]['value'] = id
-        self.buttons[1]['value'] = query
-        self.buttons[2]['value'] = query
-        self.buttons[1]['index'] = index
-        self.buttons[2]['index'] = index
-
+        self.buttons[1]['value'] = index
+        self.buttons[2]['value'] = index
 
         params = {
             'unfurl_links': False,

@@ -21,6 +21,7 @@ app = Flask(__name__)
 #   response_url=https://hooks.slack.com/commands/1234/5678
 
 tubey = Tubey()
+query = None
 
 @app.route('/tubey', methods=['POST'])
 def slash_command():
@@ -34,7 +35,9 @@ def slash_command():
     user = request.form.get('user_id', None)
     text = request.form.get('text', None)
 
-    tubey.suggest_video(text, channel, user, is_shuffle=False)
+    global query
+    query = text
+    tubey.suggest_video(text, channel, user)
 
     return make_response("", 200)
 
@@ -48,16 +51,13 @@ def button_click():
     button = payload['actions'][0]
     button_type = button['name']
     button_value = button['value']
-    button_index = button['index']
 
     result = {}
 
     if button_type == 'shuffle':
-        text = button_value
-        result = tubey.suggest_video(text, payload['channel']['id'], payload['user']['id'], is_shuffle=True)
+        result = tubey.suggest_video(query, payload['channel']['id'], payload['user']['id'], is_shuffle=True, index=button_value)
     elif button_type == 'next':
-        text = button_value
-        result = tubey.suggest_video(text, payload['channel']['id'], payload['user']['id'], is_next=True, index=button_index)
+        result = tubey.suggest_video(query, payload['channel']['id'], payload['user']['id'], is_next=True, index=button_value)
     elif button_type == 'send':
         result = tubey.send_video(user=payload['user']['name'], video_id=button_value, channel=payload['channel']['id'])
     elif button_type == 'cancel':
