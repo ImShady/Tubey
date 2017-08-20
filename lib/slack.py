@@ -68,7 +68,7 @@ class Tubey():
         if is_shuffle:
             index = randint(0, num_vids) % num_vids
         elif is_next:
-            index = int(index) + 1
+            index += 1
         elif index == num_vids:
             index = 0
 
