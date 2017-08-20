@@ -59,8 +59,10 @@ class Tubey():
     def __insert_search__(self, username, team_name, videos, query):
         mysql = self._mysql
         mysql.execute("USE tubey;")
+        video_ids = [x['id']['videoId'] for x in videos]
+        print(video_ids)
         mysql.execute("INSERT INTO video_suggestions (username, search_query, videos) VALUES ('{}', '{}', '{}')"
-                      .format(username, query, str(videos).replace("'", "\\'")))
+                      .format(username, query, str(video_ids).replace("'", "\\'")))
         mysql.commit()
         mysql.execute("SELECT * FROM video_suggestions WHERE search_id= LAST_INSERT_ID()")
         row_inserted = mysql.fetchone()
