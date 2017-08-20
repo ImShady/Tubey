@@ -4,6 +4,8 @@ from flask import abort
 from youtube import Youtube
 from random import randint
 from datetime import datetime
+from lib.mysql import MySQL
+from json import loads
 
 class Tubey():
 
@@ -31,6 +33,10 @@ class Tubey():
     def __init__(self):
         # Cache the client in memory
         self._client = None
+        self._mysql = MySQL(Config.get_variable('mysql_db', 'host'),
+                             Config.get_variable('mysql_db', 'user'),
+                             Config.get_variable('mysql_db', 'password'),
+                             int(Config.get_variable('mysql_db', 'port')))
 
     def send_message(self, params, type="Message"):
         # Sends message to the user/channel
@@ -50,11 +56,17 @@ class Tubey():
         self._client = sc
         return sc
 
-    def suggest_video(self, query, channel, user, is_shuffle):
-        # Sends a video suggestion in an ephemeral message
-        videos = self.search(query)
-        num_vids = len(videos)
-        suggested_video = videos[randint(0, num_vids) % num_vids]
+    def __insert_search__(self, username, team_name, videos, query):
+        mysql = self._mysql
+        mysql.execute("USE tubey;")
+        mysql.execute("INSERT INTO video_suggestions (username, search_query, videos) VALUES ('{}', '{}', '{}')"
+                      .format(username, query, str(videos).replace("'", "\\'")))
+        mysql.commit()
+        mysql.execute("SELECT * FROM video_suggestions WHERE search_id= LAST_INSERT_ID()")
+        row_inserted = mysql.fetchone()
+        return row_inserted[0]
+
+    def __build_message__(self, suggested_video, channel, username, search_id, index=0):
 
         published_date = datetime.strptime(suggested_video['snippet']['publishedAt'][0:10], "%Y-%m-%d").date().strftime(
             '%B %d, %Y')
@@ -65,12 +77,12 @@ class Tubey():
         id = suggested_video['id']['videoId']
 
         self.buttons[0]['value'] = id
-        self.buttons[1]['value'] = query
+        self.buttons[1]['value'] = '{"index": {}, "search_id": {}}'.format(index, search_id)
 
         params = {
             'unfurl_links': False,
             'channel': channel,
-            'user': user,
+            'user': username,
             "attachments": [{
                 "title": "Video title: {}".format(video_title),
                 "text": "Channel name: {}\nPublished date: {}\nVideo description: {}".format(channel_name, published_date, description),
@@ -84,11 +96,30 @@ class Tubey():
             }]
         }
 
-        if is_shuffle:
-            params['replace_original'] = True
-            return params
+        return params
+
+    def suggest_video(self, user_info, team_info, channel_info, query="", action_info={}):
+        # Sends a video suggestion in an ephemeral message
+        if action_info['name'] == 'shuffle':
+            button_value = loads(action_info['value'])
+            search_id = button_value['search_id']
+            channel = channel_info['id']
+            username = user_info['name']
+            videos = self._mysql.execute("select videos from video_suggestions where search_id = {}".format(search_id))[0]
+            num_vids = len(videos)
+            suggested_video = videos[randint(0, num_vids) % num_vids]
+            message_to_send = self.__build_message__(suggested_video, channel=channel,
+                                                       username=username, search_id=search_id)
+            message_to_send['replace_original'] = True
+            return message_to_send
         else:
-            response = self.send_message(params, type="Ephemeral")
+            videos = self.search(query)
+            num_vids = len(videos)
+            suggested_video = videos[randint(0, num_vids) % num_vids]
+            search_id = self.__insert_search__(videos=videos, query=query, username=user_info, team_name=team_info)
+            message_to_send = self.__build_message__(suggested_video, channel=channel_info,
+                                                       username=user_info, search_id=search_id)
+            response = self.send_message(message_to_send, type="Ephemeral")
             print(response)
 
     def send_video(self, user, video_id, channel):
