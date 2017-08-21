@@ -30,6 +30,8 @@ class Tubey():
                     "value": "Cancel dis plz"
                  }]
 
+    _youtube = Youtube()
+
     def __init__(self):
         # Cache the client in memory
         self._client = None
@@ -112,7 +114,7 @@ class Tubey():
             self._mysql.execute("select videos from video_suggestions where search_id = {}".format(search_id))
             videos = list(self._mysql.fetchone()[0])
             num_vids = len(videos)
-            suggested_video = videos[randint(0, num_vids) % num_vids]
+            suggested_video = self._youtube.get_video_metadata(videos[randint(0, num_vids) % num_vids])
             message_to_send = self.__build_message__(suggested_video, channel=channel,
                                                        username=username, search_id=search_id)
             message_to_send['replace_original'] = True
@@ -153,8 +155,7 @@ class Tubey():
         self.send_message(params)
 
     def search(self, search_query):
-        youtube = Youtube()
-        results = youtube.query(search_query)
+        results = self._youtube.query(search_query)
 
         return results['videos']
 
