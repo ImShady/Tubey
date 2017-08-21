@@ -31,11 +31,11 @@ def slash_command():
     tubey.verify_token(token)
 
     channel = request.form.get('channel_id', None)
-    user = request.form.get('user_id', None)
+    username = request.form.get('user_name', None)
     text = request.form.get('text', None)
     team_name = request.form.get('team_domain', None)
 
-    tubey.suggest_video(query=text, team_info=team_name, channel_info=channel, user_info=user)
+    tubey.suggest_video(query=text, team_info=team_name, channel_info=channel, user_info=username)
 
     return make_response("", 200)
 
