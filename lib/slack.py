@@ -6,6 +6,7 @@ from random import randint
 from datetime import datetime
 from lib.mysql import MySQL
 from json import loads
+from ast import literal_eval
 
 class Tubey():
 
@@ -112,7 +113,7 @@ class Tubey():
             username = user_info['name']
             self._mysql.execute("USE tubey;")
             self._mysql.execute("select videos from video_suggestions where search_id = {}".format(search_id))
-            videos = list(self._mysql.fetchone()[0])
+            videos = literal_eval(self._mysql.fetchone()[0])
             num_vids = len(videos)
             suggested_video = self._youtube.get_video_metadata(videos[randint(0, num_vids) % num_vids])
             message_to_send = self.__build_message__(suggested_video, channel=channel,

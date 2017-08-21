@@ -54,7 +54,7 @@ class Youtube():
 
     def get_video_metadata(self, video_id):
         payload = {'id': video_id, 'part': 'snippet', 'key': self.DEVELOPER_KEY}
-        response = requests.Session().get('https://www.googleapis.com/youtube/v3/videos', params=payload)
+        response = requests.get('https://www.googleapis.com/youtube/v3/videos', params=payload)
         return json.loads(response.content.decode("utf-8"))['items'][0]
 
 
