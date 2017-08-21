@@ -51,7 +51,7 @@ def button_click():
 
     button = payload['actions'][0]
     button_type = button['name']
-    button_value = button['value']
+    button_value = json.loads(button['value'])
 
     result = {}
 
