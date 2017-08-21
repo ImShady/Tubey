@@ -61,7 +61,7 @@ class Tubey():
         mysql.execute("USE tubey;")
         video_ids = str([x['id']['videoId'] for x in videos]).replace("'", "\\'")
         mysql.execute("INSERT INTO video_suggestions (username, search_query, videos, team_name)"
-                      " VALUES ('{}', '{}', '{}')".format(username, query, video_ids, team_name))
+                      " VALUES ('{}', '{}', '{}', '{}')".format(username, query, video_ids, team_name))
         mysql.commit()
         mysql.execute("SELECT * FROM video_suggestions WHERE search_id= LAST_INSERT_ID()")
         row_inserted = mysql.fetchone()
