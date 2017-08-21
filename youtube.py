@@ -1,7 +1,7 @@
 from googleapiclient.discovery import build
 import json
 import argparse
-
+import requests
 from lib.config import Config
 
 
@@ -51,6 +51,11 @@ class Youtube():
         results = {"videos": videos, "channels": channels}
 
         return results
+
+    def get_video_metadata(self, video_id):
+        payload = {'id': video_id, 'part': 'snippet', 'key': self.DEVELOPER_KEY}
+        response = requests.get('https://www.googleapis.com/youtube/v3/videos', params=payload)
+        return json.loads(response.content.decode("utf-8"))['items'][0]
 
 
 if __name__ == "__main__":

@@ -31,10 +31,14 @@ def slash_command():
     tubey.verify_token(token)
 
     channel = request.form.get('channel_id', None)
-    user = request.form.get('user_id', None)
+    user_id = request.form.get('user_id', None)
+    username = request.form.get('user_name', None)
     text = request.form.get('text', None)
+    team_name = request.form.get('team_domain', None)
 
-    tubey.suggest_video(text, channel, user, is_shuffle=False)
+    user_info = {"username": username, "user_id": user_id}
+
+    tubey.suggest_video(query=text, team_info=team_name, channel_info=channel, user_info=user_info)
 
     return make_response("", 200)
 
@@ -47,15 +51,15 @@ def button_click():
 
     button = payload['actions'][0]
     button_type = button['name']
-    button_value = button['value']
 
     result = {}
 
     if button_type == 'shuffle':
-        text = button_value
-        result = tubey.suggest_video(text, payload['channel']['id'], payload['user']['id'], is_shuffle=True)
+        result = tubey.suggest_video(channel_info=payload['channel'], user_info=payload['user'],
+                                     team_info=payload['team'], action_info=payload['actions'][0])
     elif button_type == 'send':
-        result = tubey.send_video(user=payload['user']['name'], video_id=button_value, channel=payload['channel']['id'])
+        result = tubey.send_video(user=payload['user']['name'], video_id=button['value'],
+                                  channel=payload['channel']['id'])
     elif button_type == 'cancel':
         result = {"delete_original": True}
 
