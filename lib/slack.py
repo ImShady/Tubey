@@ -56,12 +56,14 @@ class Tubey():
         self._client = sc
         return sc
 
-    def __insert_search__(self, username, team_name, videos, query):
+    def __insert_search__(self, user_info, team_name, videos, query):
         mysql = self._mysql
         mysql.execute("USE tubey;")
         video_ids = str([x['id']['videoId'] for x in videos]).replace("'", "\\'")
-        mysql.execute("INSERT INTO video_suggestions (username, search_query, videos, team_name)"
-                      " VALUES ('{}', '{}', '{}', '{}')".format(username, query, video_ids, team_name))
+
+        mysql.execute("INSERT INTO video_suggestions (user_name, user_id, search_query, videos, team_name)"
+                      " VALUES ('{}', '{}', '{}', '{}', '{}')".format(user_info['username'], user_info['user_id'],
+                                                                query, video_ids, team_name))
         mysql.commit()
         mysql.execute("SELECT * FROM video_suggestions WHERE search_id= LAST_INSERT_ID()")
         row_inserted = mysql.fetchone()
@@ -117,9 +119,9 @@ class Tubey():
             videos = self.search(query)
             num_vids = len(videos)
             suggested_video = videos[randint(0, num_vids) % num_vids]
-            search_id = self.__insert_search__(videos=videos, query=query, username=user_info, team_name=team_info)
+            search_id = self.__insert_search__(videos=videos, query=query, user_info=user_info, team_name=team_info)
             message_to_send = self.__build_message__(suggested_video, channel=channel_info,
-                                                       username=user_info, search_id=search_id)
+                                                       username=user_info['user_id'], search_id=search_id)
             response = self.send_message(message_to_send, type="Ephemeral")
             print(response)
 
