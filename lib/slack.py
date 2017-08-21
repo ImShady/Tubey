@@ -109,7 +109,7 @@ class Tubey():
             channel = channel_info['id']
             username = user_info['name']
             self._mysql.execute("USE tubey;")
-            self._mysql.execute("select videos from video_suggestions where search_id = {}".format(search_id))[0]
+            self._mysql.execute("select videos from video_suggestions where search_id = {}".format(search_id))
             videos = list(self._mysql.fetchone()[0])
             num_vids = len(videos)
             suggested_video = videos[randint(0, num_vids) % num_vids]
