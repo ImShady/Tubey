@@ -79,7 +79,7 @@ class Tubey():
         id = suggested_video['id']['videoId']
 
         self.buttons[0]['value'] = id
-        self.buttons[1]['value'] = '{"index": {}, "search_id": {}}'.format(index, search_id)
+        self.buttons[1]['value'] = '{{"index": {}, "search_id": {}}}'.format(index, search_id)
 
         params = {
             'unfurl_links': False,
