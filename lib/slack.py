@@ -80,7 +80,7 @@ class Tubey():
         video_title = suggested_video['snippet']['title']
         description = suggested_video['snippet']['description']
         thumbnail = suggested_video['snippet']['thumbnails']['high']['url']
-        id = suggested_video['id']['videoId']
+        id = suggested_video['id']
 
         self.buttons[0]['value'] = id
         self.buttons[1]['value'] = '{{"index": {}, "search_id": {}}}'.format(index, search_id)
