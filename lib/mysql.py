@@ -11,7 +11,11 @@ class MySQL():
         self._cursor = self._conn.cursor()
 
     def execute(self, query):
-        self._cursor.execute(query=query)
+        try:
+            self._cursor.execute(query=query)
+        except (AttributeError, pymysql.OperationalError):
+            self._reconnect()
+            self._cursor.execute(query=query)
 
     def fetchone(self):
         return self._cursor.fetchone()
@@ -19,3 +23,6 @@ class MySQL():
     def commit(self):
         return self._conn.commit()
 
+    def _reconnect(self):
+        self._conn = pymysql.connect(host=self._host, port=self._port, user=self._user, passwd=self._password)
+        self._cursor = self._conn.cursor()
