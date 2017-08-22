@@ -1,21 +1,12 @@
 import configparser
 from os import environ
+from sys import argv
 
 class Config():
 
     @staticmethod
     def config_name():
-        file = ""
-        try:
-            config = environ['TUBEY_CONFIG_PATH']
-            if config is not None and config != "":
-                file = config
-            else:
-                print("Environmental variable is set but empty!")
-        except KeyError as e:
-            print("Config file path not set in environment!")
-            pass
-
+        file = argv[1]
         return file
 
     @staticmethod
