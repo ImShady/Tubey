@@ -112,13 +112,15 @@ class Tubey():
 
     def suggest_video(self, user_info, team_info, channel_info, query="", action_info={}):
         # Sends a video suggestion in an ephemeral message
-        print(action_info)
-
-        button_value = loads(action_info['value'])
-        index = button_value['index']
-        search_id = button_value['search_id']
         channel = channel_info['id']
         username = user_info['name']
+
+        if action_info:
+            button_value = loads(action_info['value'])
+            index = button_value['index']
+            search_id = button_value['search_id']
+        else:
+            index = 0
 
         if 'name' in action_info.keys() and action_info['name'] == 'shuffle':
             self._mysql.execute("USE tubey;")
