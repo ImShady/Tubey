@@ -24,6 +24,12 @@ class Tubey():
                     "value": "Shuffle it up!"
                 },
                 {
+                    "name": "next",
+                    "text": "Next",
+                    "type": "button",
+                    "value": "NEXT!"
+                },
+                {
                     "name": "cancel",
                     "text": "Cancel",
                     "type": "button",
@@ -73,7 +79,6 @@ class Tubey():
         return row_inserted[0]
 
     def __build_message__(self, suggested_video, channel, username, search_id, index=0):
-
         published_date = datetime.strptime(suggested_video['snippet']['publishedAt'][0:10], "%Y-%m-%d").date().strftime(
             '%B %d, %Y')
         channel_name = suggested_video['snippet']['channelTitle']
@@ -84,6 +89,7 @@ class Tubey():
 
         self.buttons[0]['value'] = id
         self.buttons[1]['value'] = '{{"index": {}, "search_id": {}}}'.format(index, search_id)
+        self.buttons[2]['value'] = '{{"index": {}, "search_id": {}}}'.format(index, search_id)
 
         params = {
             'unfurl_links': False,
@@ -106,25 +112,43 @@ class Tubey():
 
     def suggest_video(self, user_info, team_info, channel_info, query="", action_info={}):
         # Sends a video suggestion in an ephemeral message
-        if 'name' in action_info.keys() and action_info['name'] == 'shuffle':
+        if action_info:
             button_value = loads(action_info['value'])
+            index = button_value['index']
             search_id = button_value['search_id']
+        else:
+            index = 0
+
+        if 'name' in action_info.keys() and action_info['name'] == 'shuffle':
             channel = channel_info['id']
             username = user_info['name']
             self._mysql.execute("USE tubey;")
             self._mysql.execute("select videos from video_suggestions where search_id = {}".format(search_id))
             videos = literal_eval(self._mysql.fetchone()[0])
             num_vids = len(videos)
-            suggested_video = self._youtube.get_video_metadata(videos[randint(0, num_vids) % num_vids])
+            index = randint(0, num_vids) % num_vids
+            suggested_video = self._youtube.get_video_metadata(videos[index])
             suggested_video['id'] = { "video_id": suggested_video['id'] }
             message_to_send = self.__build_message__(suggested_video, channel=channel,
-                                                       username=username, search_id=search_id)
+                                                       username=username, search_id=search_id, index=index)
+            message_to_send['replace_original'] = True
+            return message_to_send
+        elif 'name' in action_info.keys() and action_info['name'] == 'next':
+            channel = channel_info['id']
+            username = user_info['name']
+            self._mysql.execute("USE tubey;")
+            self._mysql.execute("select videos from video_suggestions where search_id = {}".format(search_id))
+            videos = literal_eval(self._mysql.fetchone()[0])
+            index += 1
+            suggested_video = self._youtube.get_video_metadata(videos[index])
+            suggested_video['id'] = {"video_id": suggested_video['id']}
+            message_to_send = self.__build_message__(suggested_video, channel=channel,
+                                                     username=username, search_id=search_id, index=index)
             message_to_send['replace_original'] = True
             return message_to_send
         else:
             videos = self.search(query)
-            num_vids = len(videos)
-            suggested_video = videos[randint(0, num_vids) % num_vids]
+            suggested_video = videos[index]
             search_id = self.__insert_search__(videos=videos, query=query, user_info=user_info, team_name=team_info)
             message_to_send = self.__build_message__(suggested_video, channel=channel_info,
                                                        username=user_info['user_id'], search_id=search_id)
