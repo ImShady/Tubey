@@ -47,7 +47,7 @@ class Tubey():
                              Config.get_variable('mysql_db', 'password'),
                              int(Config.get_variable('mysql_db', 'port')))
 
-    def send_message(self, params, type="Message"):
+    def __send_message__(self, params, type="Message"):
         # Sends message to the user/channel
         # Type should either be Message or Ephemeral
 
@@ -86,7 +86,7 @@ class Tubey():
             self.__insert_search__(videos=videos, query=query, user_info=user_info, team_name=team_info)
             message_to_send = self.__build_message__(suggested_video, channel=channel_info,
                                                      user_id=user_info['user_id'])
-            response = self.send_message(message_to_send, type="Ephemeral")
+            response = self.__send_message__(message_to_send, type="Ephemeral")
             print(response)
 
     def send_video(self, user, video_id, channel):
@@ -97,7 +97,7 @@ class Tubey():
             "link_names": True
         }
 
-        response = self.send_message(params)
+        response = self.__send_message__(params)
 
         return {"delete_original": True}
 
@@ -112,7 +112,7 @@ class Tubey():
                        "image_url": thumbnail_url
                        }]
                   }
-        self.send_message(params)
+        self.__send_message__(params)
 
     def search(self, search_query):
         results = self._youtube.query(search_query)
