@@ -78,7 +78,7 @@ class Tubey():
         row_inserted = mysql.fetchone()
         return row_inserted[0]
 
-    def __build_message__(self, suggested_video, channel, username, search_id, index=0):
+    def __build_message__(self, suggested_video, channel, user_id, search_id, index=0):
 
         published_date = datetime.strptime(suggested_video['snippet']['publishedAt'][0:10], "%Y-%m-%d").date().strftime(
             '%B %d, %Y')
@@ -95,7 +95,7 @@ class Tubey():
         params = {
             'unfurl_links': False,
             'channel': channel,
-            'user': username,
+            'user': user_id,
             "attachments": [{
                 "title": "Video title: {}".format(video_title),
                 "text": "Channel name: {}\nPublished date: {}\nVideo description: {}".format(channel_name, published_date, description),
@@ -124,12 +124,11 @@ class Tubey():
             button_value = loads(action_info['value'])
             search_id = button_value['search_id']
             channel = channel_info['id']
-            username = user_info['name']
             videos = self.__get_videos__(search_id)
             num_vids = len(videos)
             suggested_video = self._youtube.get_video_metadata(videos[randint(0, num_vids) % num_vids])
             suggested_video['id'] = { "videoId": suggested_video['id'] }
-            message_to_send = self.__build_message__(suggested_video, channel=channel, username=username,
+            message_to_send = self.__build_message__(suggested_video, channel=channel, user_id=user_info['id'],
                                                      search_id=search_id, index=button_value['index'])
             message_to_send['replace_original'] = True
             return message_to_send
@@ -139,7 +138,6 @@ class Tubey():
             index = button_value['index']
             search_id = button_value['search_id']
             channel = channel_info['id']
-            username = user_info['name']
             videos = self.__get_videos__(search_id)
             if index == 24:
                 index = 0
@@ -147,7 +145,7 @@ class Tubey():
                 index += 1
             suggested_video = self._youtube.get_video_metadata(videos[index])
             suggested_video['id'] = {"videoId": suggested_video['id']}
-            message_to_send = self.__build_message__(suggested_video, channel=channel, username=username,
+            message_to_send = self.__build_message__(suggested_video, channel=channel, user_id=user_info['id'],
                                                      search_id=search_id, index=index)
             message_to_send['replace_original'] = True
             return message_to_send
@@ -158,7 +156,7 @@ class Tubey():
             suggested_video = videos[0]
             search_id = self.__insert_search__(videos=videos, query=query, user_info=user_info, team_name=team_info)
             message_to_send = self.__build_message__(suggested_video, channel=channel_info,
-                                                     username=user_info['user_id'], search_id=search_id)
+                                                     user_id=user_info['user_id'], search_id=search_id)
             response = self.send_message(message_to_send, type="Ephemeral")
             print(response)
 
