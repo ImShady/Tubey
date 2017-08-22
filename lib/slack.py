@@ -141,7 +141,10 @@ class Tubey():
             channel = channel_info['id']
             username = user_info['name']
             videos = self.__get_videos__(search_id)
-            index += 1
+            if index == 24:
+                index = 0
+            else:
+                index += 1
             suggested_video = self._youtube.get_video_metadata(videos[index])
             suggested_video['id'] = {"videoId": suggested_video['id']}
             message_to_send = self.__build_message__(suggested_video, channel=channel, username=username,
