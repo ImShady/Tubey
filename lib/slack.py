@@ -116,7 +116,7 @@ class Tubey():
             videos = literal_eval(self._mysql.fetchone()[0])
             num_vids = len(videos)
             suggested_video = self._youtube.get_video_metadata(videos[randint(0, num_vids) % num_vids])
-            suggested_video['id'] = { "video_id": suggested_video['id'] }
+            suggested_video['id'] = { "videoId": suggested_video['id'] }
             message_to_send = self.__build_message__(suggested_video, channel=channel,
                                                        username=username, search_id=search_id)
             message_to_send['replace_original'] = True
