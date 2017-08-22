@@ -118,6 +118,8 @@ class Tubey():
         channel = channel_info['id']
         username = user_info['name']
 
+        print(action_info)
+
         if 'name' in action_info.keys() and action_info['name'] == 'shuffle':
             self._mysql.execute("USE tubey;")
             self._mysql.execute("select videos from video_suggestions where search_id = {}".format(search_id))
