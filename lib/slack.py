@@ -24,16 +24,16 @@ class Tubey():
                     "value": "NEXT!"
                 },
                 {
-                    "name": "shuffle",
-                    "text": "Shuffle",
-                    "type": "button",
-                    "value": "Shuffle it up!"
-                },
-                {
                     "name": "back",
                     "text": "Back",
                     "type": "button",
                     "value": "Back!"
+                },
+                {
+                    "name": "shuffle",
+                    "text": "Shuffle",
+                    "type": "button",
+                    "value": "Shuffle it up!"
                 },
                 {
                     "name": "cancel",
@@ -62,17 +62,8 @@ class Tubey():
 
     def suggest_video(self, user_info, team_info, channel_info, query="", action_info={}):
         # Sends a video suggestion in an ephemeral message
-        if 'name' in action_info.keys() and action_info['name'] == 'shuffle':
-            search_id = action_info['value']
-            videos = self.__get_videos__(search_id) # fetch the list of videos for the corresponding search_id
-            num_vids = len(videos) # get length of videos (as of now, will always be <=25 from the YouTube API)
-            suggested_video = self._youtube.get_video_metadata(videos[randint(0, num_vids) % num_vids])
-            suggested_video['id'] = {"videoId": suggested_video['id']} # Will eventually get rid of this
-            message_to_send = self.__build_message__(suggested_video, channel=channel_info['id'], user_id=user_info['id'])
-            message_to_send['replace_original'] = True
-            return message_to_send
 
-        elif 'name' in action_info.keys() and action_info['name'] == 'next':
+        if 'name' in action_info.keys() and action_info['name'] == 'next':
             button_value = loads(action_info['value']) # load value key of button which as a dict
             index = button_value['index'] # extract the index
             search_id = button_value['search_id'] # extract the search_id
@@ -92,10 +83,20 @@ class Tubey():
             videos = self.__get_videos__(search_id)  # fetch the list of videos for the corresponding search_id
             index = 0 if index == len(videos) - 1 else index - 1  # decrement the index until list length then reset to 0
             suggested_video = self._youtube.get_video_metadata(videos[index])
-            self.buttons[3]['value'] = '{{"index": {}, "search_id": {}}}'.format(index, search_id)
+            self.buttons[2]['value'] = '{{"index": {}, "search_id": {}}}'.format(index, search_id)
             suggested_video['id'] = {"videoId": suggested_video['id']}  # Will eventually get rid of this
             message_to_send = self.__build_message__(suggested_video, channel=channel_info['id'],
                                                      user_id=user_info['id'])
+            message_to_send['replace_original'] = True
+            return message_to_send
+
+        elif 'name' in action_info.keys() and action_info['name'] == 'shuffle':
+            search_id = action_info['value']
+            videos = self.__get_videos__(search_id) # fetch the list of videos for the corresponding search_id
+            num_vids = len(videos) # get length of videos (as of now, will always be <=25 from the YouTube API)
+            suggested_video = self._youtube.get_video_metadata(videos[randint(0, num_vids) % num_vids])
+            suggested_video['id'] = {"videoId": suggested_video['id']} # Will eventually get rid of this
+            message_to_send = self.__build_message__(suggested_video, channel=channel_info['id'], user_id=user_info['id'])
             message_to_send['replace_original'] = True
             return message_to_send
 
@@ -170,7 +171,7 @@ class Tubey():
         row_inserted = mysql.fetchone()
         search_id = row_inserted[0]
         self.buttons[1]['value'] = '{{"index": 0, "search_id": {}}}'.format(search_id)
-        self.buttons[2]['value'] = search_id
+        self.buttons[2]['value'] = '{{"index": 0, "search_id": {}}}'.format(search_id)
         self.buttons[3]['value'] = search_id
 
     def __build_message__(self, suggested_video, channel, user_id, index=0):
