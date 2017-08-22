@@ -71,6 +71,7 @@ class Tubey():
             index = 0 if index == len(videos) - 1 else index + 1 # increment the index until list length then reset to 0
             suggested_video = self._youtube.get_video_metadata(videos[index])
             self.buttons[1]['value'] = '{{"index": {}, "search_id": {}}}'.format(index, search_id)
+            self.buttons[2]['value'] = '{{"index": {}, "search_id": {}}}'.format(index, search_id)
             suggested_video['id'] = {"videoId": suggested_video['id']} # Will eventually get rid of this
             message_to_send = self.__build_message__(suggested_video, channel=channel_info['id'], user_id=user_info['id'])
             message_to_send['replace_original'] = True
@@ -83,6 +84,7 @@ class Tubey():
             videos = self.__get_videos__(search_id)  # fetch the list of videos for the corresponding search_id
             index = 0 if index == len(videos) - 1 else index - 1  # decrement the index until list length then reset to 0
             suggested_video = self._youtube.get_video_metadata(videos[index])
+            self.buttons[1]['value'] = '{{"index": {}, "search_id": {}}}'.format(index, search_id)
             self.buttons[2]['value'] = '{{"index": {}, "search_id": {}}}'.format(index, search_id)
             suggested_video['id'] = {"videoId": suggested_video['id']}  # Will eventually get rid of this
             message_to_send = self.__build_message__(suggested_video, channel=channel_info['id'],
