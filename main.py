@@ -54,7 +54,7 @@ def button_click():
 
     result = {}
 
-    if button_type == 'shuffle' or button_type == 'next':
+    if button_type not in ['send', 'cancel']:
         result = tubey.suggest_video(channel_info=payload['channel'], user_info=payload['user'],
                                      team_info=payload['team'], action_info=payload['actions'][0])
     elif button_type == 'send':
