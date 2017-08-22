@@ -16,7 +16,7 @@ class Youtube():
         parser = argparse.ArgumentParser(prog='PROG', conflict_handler='resolve')
         parser.add_argument("--q", help="Search term", default=search_query)
         parser.add_argument("--max-results", help="Max results", default=25)
-        args = parser.parse_args()
+        args, unknown = parser.parse_known_args()
         options = args
         youtube = build(self.YOUTUBE_API_SERVICE_NAME, self.YOUTUBE_API_VERSION,
           developerKey=self.DEVELOPER_KEY)
