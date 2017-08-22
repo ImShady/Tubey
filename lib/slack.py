@@ -178,15 +178,16 @@ class Tubey():
         self.buttons[2]['value'] = '{{"index": 0, "search_id": {}}}'.format(search_id)
         self.buttons[3]['value'] = search_id
 
-    def __build_message__(self, suggested_video, channel, user_id, index=0):
+    def __build_message__(self, suggested_video, channel, user_id):
 
         published_date = datetime.strptime(suggested_video['snippet']['publishedAt'][0:10], "%Y-%m-%d").date().strftime(
             '%B %d, %Y')
         channel_name = suggested_video['snippet']['channelTitle']
+        channel_id = suggested_video['id']['channelId']
         video_title = suggested_video['snippet']['title']
         description = suggested_video['snippet']['description']
         thumbnail = suggested_video['snippet']['thumbnails']['high']['url']
-        id = suggested_video['id']['videoId']
+        video_id = suggested_video['id']['videoId']
 
         self.buttons[0]['value'] = id
 
@@ -196,8 +197,10 @@ class Tubey():
             'user': user_id,
             "attachments": [{
                 "title": "Video title: {}".format(video_title),
-                "text": "Channel name: {}\nPublished date: {}\nVideo description: {}".format(channel_name, published_date, description),
-                "title_link": "https://www.youtube.com/watch?v=".format(id),
+                "author_name": "{}".format(channel_name),
+                "author_link": "https://www.youtube.com/channel/{}".format(channel_id),
+                "text": "Published date: {}\nVideo description: {}".format(published_date, description),
+                "title_link": "https://www.youtube.com/watch?v=".format(video_id),
                 "image_url": thumbnail,
                 "fallback": "You need to upgrade your Slack client to use this command!",
                 "color": "#CD201F",
