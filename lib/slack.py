@@ -88,8 +88,6 @@ class Tubey():
             response = self.send_message(message_to_send, type="Ephemeral")
             print(response)
 
-            self.buttons[0]['value'] = suggested_video['id']
-
     def send_video(self, user, video_id, channel):
         # Sends a chosen video to the channel
         params =  {
@@ -161,7 +159,7 @@ class Tubey():
         video_title = suggested_video['snippet']['title']
         description = suggested_video['snippet']['description']
         thumbnail = suggested_video['snippet']['thumbnails']['high']['url']
-        id = suggested_video['video']['videoId']
+        id = suggested_video['id']['videoId']
 
         self.buttons[0]['value'] = id
 
