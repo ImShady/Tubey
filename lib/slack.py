@@ -163,7 +163,7 @@ class Tubey():
         thumbnail = suggested_video['snippet']['thumbnails']['high']['url']
         video_id = suggested_video['id']['videoId']
 
-        self.buttons[0]['value'] = id
+        self.buttons[0]['value'] = video_id
 
         params = {
             'unfurl_links': False,
