@@ -54,99 +54,27 @@ class Tubey():
         client = self.__get_client__()
         return client.api_call("chat.post" + type, **params)
 
-    def __get_client__(self):
-        # Fetch a cached slack client or create one and return it
-        # type is either 'bot' or 'user'
-        if self._client is not None:
-            return self._client
-
-        token = Config.get_variable('tubey', 'oauth_token')
-        sc = SlackClient(token)
-        self._client = sc
-        return sc
-
-    def __insert_search__(self, user_info, team_name, videos, query):
-        mysql = self._mysql
-        mysql.execute("USE tubey;")
-        video_ids = str([x['id']['videoId'] for x in videos]).replace("'", "\\'")
-
-        mysql.execute("INSERT INTO video_suggestions (user_name, user_id, search_query, videos, team_name)"
-                      " VALUES ('{}', '{}', '{}', '{}', '{}')".format(user_info['username'], user_info['user_id'],
-                                                                query, video_ids, team_name))
-        mysql.commit()
-        mysql.execute("SELECT * FROM video_suggestions WHERE search_id= LAST_INSERT_ID()")
-        row_inserted = mysql.fetchone()
-        return row_inserted[0]
-
-    def __build_message__(self, suggested_video, channel, user_id, search_id, index=0):
-
-        published_date = datetime.strptime(suggested_video['snippet']['publishedAt'][0:10], "%Y-%m-%d").date().strftime(
-            '%B %d, %Y')
-        channel_name = suggested_video['snippet']['channelTitle']
-        video_title = suggested_video['snippet']['title']
-        description = suggested_video['snippet']['description']
-        thumbnail = suggested_video['snippet']['thumbnails']['high']['url']
-        id = suggested_video['id']['videoId']
-
-        self.buttons[0]['value'] = id
-        self.buttons[1]['value'] = '{{"index": {}, "search_id": {}}}'.format(index, search_id)
-        self.buttons[2]['value'] = '{{"index": {}, "search_id": {}}}'.format(index, search_id)
-
-        params = {
-            'unfurl_links': False,
-            'channel': channel,
-            'user': user_id,
-            "attachments": [{
-                "title": "Video title: {}".format(video_title),
-                "text": "Channel name: {}\nPublished date: {}\nVideo description: {}".format(channel_name, published_date, description),
-                "title_link": "https://www.youtube.com/watch?v=".format(id),
-                "image_url": thumbnail,
-                "fallback": "You need to upgrade your Slack client to use this command!",
-                "color": "#CD201F",
-                "attachment_type": "default",
-                "actions": self.buttons,
-                "callback_id": "primary_menu"
-            }]
-        }
-
-        return params
-
-    def __get_videos__(self, search_id):
-        self._mysql.execute("USE tubey;")
-        self._mysql.execute("select videos from video_suggestions where search_id = {}".format(search_id))
-        videos = literal_eval(self._mysql.fetchone()[0])
-
-        return videos
-
     def suggest_video(self, user_info, team_info, channel_info, query="", action_info={}):
         # Sends a video suggestion in an ephemeral message
         if 'name' in action_info.keys() and action_info['name'] == 'shuffle':
-            button_value = loads(action_info['value'])
-            search_id = button_value['search_id']
-            channel = channel_info['id']
-            videos = self.__get_videos__(search_id)
-            num_vids = len(videos)
+            search_id = action_info['value'] # load value key of button which as a dict
+            videos = self.__get_videos__(search_id) # fetch the list of videos for the corresponding search_id
+            num_vids = len(videos) # get length of videos (as of now, will always be 25 from the YouTube API)
             suggested_video = self._youtube.get_video_metadata(videos[randint(0, num_vids) % num_vids])
-            suggested_video['id'] = { "videoId": suggested_video['id'] }
-            message_to_send = self.__build_message__(suggested_video, channel=channel, user_id=user_info['id'],
-                                                     search_id=search_id, index=button_value['index'])
+            message_to_send = self.__build_message__(suggested_video, channel=channel_info['id'], user_id=user_info['id'])
             message_to_send['replace_original'] = True
             return message_to_send
 
         elif 'name' in action_info.keys() and action_info['name'] == 'next':
-            button_value = loads(action_info['value'])
-            index = button_value['index']
-            search_id = button_value['search_id']
-            channel = channel_info['id']
+            button_value = loads(action_info['value']) # load value key of button which as a dict
+            index = button_value['index'] # extract the index
+            search_id = button_value['search_id'] # extract the search_id
             videos = self.__get_videos__(search_id)
-            if index == 24:
-                index = 0
-            else:
-                index += 1
+            index = 0 if index == 24 else index + 1 # increment the index until 24 then reset to 0
             suggested_video = self._youtube.get_video_metadata(videos[index])
+            self.buttons[1]['value'] = '{{"index": {}, "search_id": {}}}'.format(index, search_id)
             suggested_video['id'] = {"videoId": suggested_video['id']}
-            message_to_send = self.__build_message__(suggested_video, channel=channel, user_id=user_info['id'],
-                                                     search_id=search_id, index=index)
+            message_to_send = self.__build_message__(suggested_video, channel=channel_info['id'], user_id=user_info['id'])
             message_to_send['replace_original'] = True
             return message_to_send
 
@@ -154,11 +82,13 @@ class Tubey():
         else:
             videos = self.search(query)
             suggested_video = videos[0]
-            search_id = self.__insert_search__(videos=videos, query=query, user_info=user_info, team_name=team_info)
+            self.__insert_search__(videos=videos, query=query, user_info=user_info, team_name=team_info)
             message_to_send = self.__build_message__(suggested_video, channel=channel_info,
-                                                     user_id=user_info['user_id'], search_id=search_id)
+                                                     user_id=user_info['user_id'])
             response = self.send_message(message_to_send, type="Ephemeral")
             print(response)
+
+            self.buttons[0]['value'] = suggested_video['id']
 
     def send_video(self, user, video_id, channel):
         # Sends a chosen video to the channel
@@ -196,6 +126,70 @@ class Tubey():
         # Validate the request parameters
         if token != verif_token:
             abort(401)  # Unauthorized request. If you're not Slack, go away
+
+    def __get_client__(self):
+        # Fetch a cached slack client or create one and return it
+        # type is either 'bot' or 'user'
+        if self._client is not None:
+            return self._client
+
+        token = Config.get_variable('tubey', 'oauth_token')
+        sc = SlackClient(token)
+        self._client = sc
+        return sc
+
+    def __insert_search__(self, user_info, team_name, videos, query):
+        mysql = self._mysql
+        mysql.execute("USE tubey;")
+        video_ids = str([x['id']['videoId'] for x in videos]).replace("'", "\\'")
+
+        mysql.execute("INSERT INTO video_suggestions (user_name, user_id, search_query, videos, team_name)"
+                      " VALUES ('{}', '{}', '{}', '{}', '{}')".format(user_info['username'], user_info['user_id'],
+                                                                query, video_ids, team_name))
+        mysql.commit()
+        mysql.execute("SELECT * FROM video_suggestions WHERE search_id= LAST_INSERT_ID()")
+        row_inserted = mysql.fetchone()
+        search_id = row_inserted[0]
+        self.buttons[1]['value'] = '{{"index": 0, "search_id": {}}}'.format(search_id)
+        self.buttons[2]['value'] = search_id
+
+    def __build_message__(self, suggested_video, channel, user_id, index=0):
+
+        published_date = datetime.strptime(suggested_video['snippet']['publishedAt'][0:10], "%Y-%m-%d").date().strftime(
+            '%B %d, %Y')
+        channel_name = suggested_video['snippet']['channelTitle']
+        video_title = suggested_video['snippet']['title']
+        description = suggested_video['snippet']['description']
+        thumbnail = suggested_video['snippet']['thumbnails']['high']['url']
+        id = suggested_video['video']['videoId']
+
+        self.buttons[0]['value'] = id
+
+        params = {
+            'unfurl_links': False,
+            'channel': channel,
+            'user': user_id,
+            "attachments": [{
+                "title": "Video title: {}".format(video_title),
+                "text": "Channel name: {}\nPublished date: {}\nVideo description: {}".format(channel_name, published_date, description),
+                "title_link": "https://www.youtube.com/watch?v=".format(id),
+                "image_url": thumbnail,
+                "fallback": "You need to upgrade your Slack client to use this command!",
+                "color": "#CD201F",
+                "attachment_type": "default",
+                "actions": self.buttons,
+                "callback_id": "primary_menu"
+            }]
+        }
+
+        return params
+
+    def __get_videos__(self, search_id):
+        self._mysql.execute("USE tubey;")
+        self._mysql.execute("select videos from video_suggestions where search_id = {}".format(search_id))
+        videos = literal_eval(self._mysql.fetchone()[0])
+
+        return videos
 
 if __name__ == "__main__":
     # Should probably put a legitimate sample run here...I'll start it off
