@@ -164,12 +164,14 @@ class Tubey():
         mysql = self._mysql
         mysql.execute("USE tubey;")
         video_ids = str([x['id']['videoId'] for x in videos]).replace("'", "\\'")
+        table = Config.get_variable('mysql_db', 'table')
+        insert_query = """
+        INSERT INTO {} (user_name, user_id, search_query, videos, team_name)  VALUES ('{}', '{}', '{}', '{}', '{}')"""\
+            .format(table, user_info['username'], user_info['user_id'], query, video_ids, team_name)
 
-        mysql.execute("INSERT INTO video_suggestions (user_name, user_id, search_query, videos, team_name)"
-                      " VALUES ('{}', '{}', '{}', '{}', '{}')".format(user_info['username'], user_info['user_id'],
-                                                                query, video_ids, team_name))
+        mysql.execute(insert_query)
         mysql.commit()
-        mysql.execute("SELECT * FROM video_suggestions WHERE search_id= LAST_INSERT_ID()")
+        mysql.execute("SELECT * FROM {} WHERE search_id= LAST_INSERT_ID()".format(table))
         row_inserted = mysql.fetchone()
         search_id = row_inserted[0]
         self.buttons[1]['value'] = '{{"index": 0, "search_id": {}}}'.format(search_id)
@@ -209,7 +211,8 @@ class Tubey():
 
     def __get_videos__(self, search_id):
         self._mysql.execute("USE tubey;")
-        self._mysql.execute("select videos from video_suggestions where search_id = {}".format(search_id))
+        table = Config.get_variable('mysql_db', 'table')
+        self._mysql.execute("select videos from {} where search_id = {}".format(table, search_id))
         videos = literal_eval(self._mysql.fetchone()[0])
 
         return videos
