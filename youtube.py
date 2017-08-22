@@ -4,7 +4,6 @@ import argparse
 import requests
 from lib.config import Config
 
-
 class Youtube():
     """Class that contains all of the youtube API related functions"""
 
