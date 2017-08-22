@@ -18,16 +18,16 @@ class Tubey():
                     "value": "Send that pineapple"
                 },
                 {
-                    "name": "shuffle",
-                    "text": "Shuffle",
-                    "type": "button",
-                    "value": "Shuffle it up!"
-                },
-                {
                     "name": "next",
                     "text": "Next",
                     "type": "button",
                     "value": "NEXT!"
+                },
+                {
+                    "name": "shuffle",
+                    "text": "Shuffle",
+                    "type": "button",
+                    "value": "Shuffle it up!"
                 },
                 {
                     "name": "cancel",
