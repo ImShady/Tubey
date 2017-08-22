@@ -183,7 +183,7 @@ class Tubey():
         published_date = datetime.strptime(suggested_video['snippet']['publishedAt'][0:10], "%Y-%m-%d").date().strftime(
             '%B %d, %Y')
         channel_name = suggested_video['snippet']['channelTitle']
-        channel_id = suggested_video['id']['channelId']
+        channel_id = suggested_video['snippet']['channelId']
         video_title = suggested_video['snippet']['title']
         description = suggested_video['snippet']['description']
         thumbnail = suggested_video['snippet']['thumbnails']['high']['url']
