@@ -171,7 +171,7 @@ class Tubey():
             'user': user_id,
             "attachments": [{
                 "title": "Video title: {}".format(video_title),
-                "author_name": "{}".format(channel_name),
+                "author_name": channel_name,
                 "author_link": "https://www.youtube.com/channel/{}".format(channel_id),
                 "text": "Published date: {}\nVideo description: {}".format(published_date, description),
                 "title_link": "https://www.youtube.com/watch?v=".format(video_id),
