@@ -57,7 +57,7 @@ class Tubey():
     def suggest_video(self, user_info, team_info, channel_info, query="", action_info={}):
         # Sends a video suggestion in an ephemeral message
         if 'name' in action_info.keys() and action_info['name'] == 'shuffle':
-            search_id = action_info['value'] # load value key of button which as a dict
+            search_id = action_info['value']
             videos = self.__get_videos__(search_id) # fetch the list of videos for the corresponding search_id
             num_vids = len(videos) # get length of videos (as of now, will always be <=25 from the YouTube API)
             suggested_video = self._youtube.get_video_metadata(videos[randint(0, num_vids) % num_vids])
