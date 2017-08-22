@@ -1,5 +1,4 @@
 import configparser
-from os import environ
 from sys import argv
 
 class Config():
