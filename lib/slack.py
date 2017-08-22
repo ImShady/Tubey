@@ -82,7 +82,7 @@ class Tubey():
             index = button_value['index']  # extract the index
             search_id = button_value['search_id']  # extract the search_id
             videos = self.__get_videos__(search_id)  # fetch the list of videos for the corresponding search_id
-            index = 0 if index == len(videos) - 1 else index - 1  # decrement the index until list length then reset to 0
+            index = len(videos) - 1 if index == 0 else index - 1  # decrement the index until list length then reset to 0
             suggested_video = self._youtube.get_video_metadata(videos[index])
             self.buttons[1]['value'] = '{{"index": {}, "search_id": {}}}'.format(index, search_id)
             self.buttons[2]['value'] = '{{"index": {}, "search_id": {}}}'.format(index, search_id)
