@@ -6,6 +6,7 @@ class MySQL():
         self._host = host
         self._user = user
         self._password = password
+        self._port = port
         self._conn = pymysql.connect(host=host, port=port,
                        user=user, passwd=password)
         self._cursor = self._conn.cursor()
