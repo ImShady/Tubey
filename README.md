@@ -1,2 +1,2 @@
 # Tubey
-Tubey is an intuitive bot integrated with Slack for quick search and subscriber notifications.
+Tubey is an intuitive YouTube bot integrated with Slack for quick search and subscriber notifications.
